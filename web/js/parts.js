@@ -1,4 +1,14 @@
-import { clearDetails, partListManager, carPartListManager, addItemToList, format_date, getActivePart, init_web3, getOwnedItemsWithDetailsFromEvent } from "./utils.js"
+import {
+    clearDetails,
+    partListManager,
+    carPartListManager,
+    addItemToList,
+    format_date,
+    getActivePart,
+    init_web3,
+    getOwnedItemsWithDetailsFromEvent,
+    getOwnerHistoryFromEvents
+} from "./utils.js"
 
 window.onload = async function () {
 
@@ -6,8 +16,28 @@ window.onload = async function () {
 
     // Get active account's owned parts
     getOwnedItemsWithDetailsFromEvent(window.accounts[0], 'TransferPartOwnership').then(async (parts) => {
-        parts.forEach(part => {
-            addItemToList(`${part.part} (${part.part_type}) - ${part.creation_date}`, "part-list", function(e) { partListManager.call(e.target, part.part) })
+        // Mark parts that we own
+        let markedParts = await Promise.all(parts.map(async (part) => {
+            let owners = await getOwnerHistoryFromEvents('TransferPartOwnership', part.part)
+            if (owners[owners.length - 1] === window.accounts[0]) {
+                return {
+                    ...part,
+                    owned: true
+                }
+            } else {
+                return {
+                    ...part,
+                    owned: false
+                }
+            }
+        }))
+
+        let ownedParts = markedParts.filter(part => {
+            return part.owned
+        })
+
+        ownedParts.forEach(part => {
+            addItemToList(`(${part.part_type}) - ${part.creation_date} - ${part.part}`, "part-list", function(e) { partListManager.call(e.target, part.part) })
         })
     })
 
