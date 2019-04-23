@@ -1,8 +1,15 @@
-import { clearDetails, partListManager, carPartListManager, addItemToList, format_date, getActivePart, init_web3 } from "./utils.js"
+import { clearDetails, partListManager, carPartListManager, addItemToList, format_date, getActivePart, init_web3, getOwnedItemsWithDetailsFromEvent } from "./utils.js"
 
 window.onload = async function () {
 
     var x = await init_web3()
+
+    // Get active account's owned parts
+    getOwnedItemsWithDetailsFromEvent(window.accounts[0], 'TransferPartOwnership').then(async (parts) => {
+        parts.forEach(part => {
+            addItemToList(`${part.part} (${part.part_type}) - ${part.creation_date}`, "part-list", function(e) { partListManager.call(e.target, part.part) })
+        })
+    })
 
     document.getElementById("build-part").addEventListener("click", function () {
         console.log("Create Part")
@@ -31,7 +38,8 @@ window.onload = async function () {
 
     document.getElementById("part-change-ownership-btn").addEventListener("click", function () {
         console.log("Change Ownership")
-        //Get part data from active item on owned list
+
+        // Get part data from active item on owned list
 
         var hash_element = getActivePart("part-list")
         if (hash_element != undefined) {

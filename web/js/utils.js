@@ -117,13 +117,16 @@ function clearCarDetails() {
     document.getElementById("car-details-creation-date").textContent = ""
 }
 
-function partListManager() {
+function partListManager(part) {
+    console.log(this)
     toggleActive(this)
     clearActiveExcept(this)
 
+    let part_hash = part ? part : this.textContent
+
     if (this.classList.contains("active")) {
         //Add info to list_name-details
-        populateDetails(this.textContent)
+        populateDetails(part_hash)
     } else {
         clearDetails()
     }
@@ -167,11 +170,13 @@ function format_date() {
 
 function getActivePart(parent) {
     var item_list = document.getElementsByClassName("collection-item")
+
     for (var i = 0; i < item_list.length; i++) {
         if (item_list[i].parentElement.id == parent && item_list[i].classList.contains("active")) {
             return item_list[i]
         }
     }
+
     return undefined
 }
 
@@ -353,7 +358,7 @@ async function init_web3() {
         }
     ])
 
-    window.pm.options.address = '0xE5987169978243A040fba66245E982D884108A70'
+    window.pm.options.address = '0x71110AAb2AAfe5a43bfD574C997519c608499dc8'
 
     window.co = new web3.eth.Contract([
         {
@@ -497,7 +502,7 @@ async function init_web3() {
             "signature": "0xac814490"
         }
     ])
-    window.co.options.address = "0x5F064EDfd972D3Cd9A129b8DFE96Ea7fEe5Dd000"
+    window.co.options.address = "0x5356a173ec0BCF064Ef40E4841337183aEC39841"
 }
 
 async function getOwnerHistoryFromEvents(event, p_hash) {
@@ -514,11 +519,30 @@ async function getOwnerHistoryFromEvents(event, p_hash) {
     )
 }
 
+async function getOwnedItemsWithDetailsFromEvent(addr, event) {
+    var parts = await getOwnedItemsFromEvent(addr, event)
+
+    return Promise.all(parts.map(part => {
+        // Fetch part info to get type
+        return new Promise((resolve, reject) => {
+            window.pm.methods.parts(part).call({ from: addr }, (error, part_info) => {
+                if (error) return reject(error)
+
+                resolve({
+                    ...part_info,
+                    part: part
+                })
+            })
+        })
+    }))
+}
+
 async function getOwnedItemsFromEvent(addr, event) {
+    console.log('Getting owned items from event: ', event)
     return window.co.getPastEvents(event, { filter: { account: addr }, fromBlock: 0, toBlock: 'latest' }).then(
         function (result) {
             console.log(result)
-            //When we get 
+
             var items = []
             for (var i = 0; i < result.length; i++) {
                 items.push(result[i].returnValues.p)
@@ -568,5 +592,5 @@ export {
     toggleActive, clearActiveExcept, populateDetails, populateCarDetails, clearDetails,
     clearCarDetails, partListManager, carPartListManager, carListManager, addItemToList,
     format_date, getActivePart, init_web3, getMultipleActivePart, getOwnerHistoryFromEvents, getOwnedItemsFromEvent,
-    dealerPartListManager, dealerProductListManager
+    dealerPartListManager, dealerProductListManager, getOwnedItemsWithDetailsFromEvent
 };

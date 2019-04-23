@@ -1,14 +1,14 @@
 pragma solidity >=0.4.21 <0.6.0;
 
 contract ProductManagement {
-    struct Part{
+    struct Part {
         address manufacturer;
         string serial_number;
         string part_type;
         string creation_date;
     }
 
-    struct Product{
+    struct Product {
         address manufacturer;
         string serial_number;
         string product_type;
@@ -34,6 +34,7 @@ contract ProductManagement {
         bytes memory b_full = bytes(s_full);
         uint j = 0;
         uint i;
+
         for(i = 0; i < b_a1.length; i++){
             b_full[j++] = b_a1[i];
         }
@@ -54,7 +55,7 @@ contract ProductManagement {
     function buildPart(string memory serial_number, string memory part_type, string memory creation_date) public returns (bytes32){
         //Create hash for data and check if it exists. If it doesn't, create the part and return the ID to the user
         bytes32 part_hash = concatenateInfoAndHash(msg.sender, serial_number, part_type, creation_date);
-        
+
         require(parts[part_hash].manufacturer == address(0), "Part ID already used");
 
         Part memory new_part = Part(msg.sender, serial_number, part_type, creation_date);
@@ -71,7 +72,7 @@ contract ProductManagement {
 
         //Create hash for data and check if exists. If it doesn't, create the part and return the ID to the user
         bytes32 product_hash = concatenateInfoAndHash(msg.sender, serial_number, product_type, creation_date);
-        
+
         require(products[product_hash].manufacturer == address(0), "Product ID already used");
 
         Product memory new_product = Product(msg.sender, serial_number, product_type, creation_date, part_array);

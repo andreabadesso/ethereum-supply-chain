@@ -18,10 +18,8 @@ window.onload = async function () {
 
     //Get all the parts that belonged to this factory and then check the ones that still do
     var parts = await getOwnedItemsFromEvent(window.accounts[0], 'TransferPartOwnership')
-    console.log(parts)
     for (var i = 0; i < parts.length; i++) {
         var owners = await getOwnerHistoryFromEvents('TransferPartOwnership', parts[i])
-        console.log(owners)
         if (owners[owners.length - 1] == window.accounts[0]) {
             addItemToList(parts[i], "car-part-list", carPartListManager)
         }
@@ -50,6 +48,7 @@ window.onload = async function () {
             console.log(serial)
             console.log(part_array)
             console.log(creation_date)
+
             //Finally, build the car
             window.pm.methods.buildProduct(serial, "Car", creation_date, part_array).send({ from: window.accounts[0], gas: 2000000 }, function (error, result) {
                 if (error) {
