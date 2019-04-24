@@ -156,6 +156,8 @@ function addItemToList(item, list_name, click_function) {
     element.classList.add("collection-item")
     element.addEventListener("click", click_function)
     document.getElementById(list_name).appendChild(element)
+
+	return element
 }
 
 function format_date() {

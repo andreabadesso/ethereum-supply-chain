@@ -37,7 +37,10 @@ window.onload = async function () {
         })
 
         ownedParts.forEach(part => {
-            addItemToList(`(${part.part_type}) - ${part.creation_date} - ${part.part}`, "part-list", function(e) { partListManager.call(e.target, part.part) })
+            addItemToList(`(${part.part_type}) - ${part.creation_date} - ${part.part}`, "part-list", function(e) {
+                console.log('PART => ', part);
+                partListManager.call(e.target, part.part)
+            })
         })
     })
 
@@ -63,7 +66,7 @@ window.onload = async function () {
         console.log(part_sha)
 
         //Add part hash to part-list for querying
-        addItemToList(part_sha, "part-list", partListManager)
+        addItemToList(part_sha, "part-list", (e) => partListManager.call(e.target, part_sha))
     })
 
     document.getElementById("part-change-ownership-btn").addEventListener("click", function () {

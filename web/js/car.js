@@ -81,9 +81,10 @@ window.onload = async function () {
         if (serial != "") {
             //Then the parts that will be present on the car
             var part_list = getMultipleActivePart()
+            console.log('part list: ', part_list)
             var part_array = []
             for (var i = 0; i < part_list.length; i++) {
-                part_array.push(part_list[i].textContent)
+                part_array.push(part_list[i].textContent.split(' - ')[2])
             }
 
             // //Fill part array with dummy elements for the unprovided parts
@@ -126,6 +127,7 @@ window.onload = async function () {
         if (hash_element != undefined) {
             var to_address = document.getElementById("car-change-ownership-input").value
             if (to_address != "") {
+            console.log('TO ADDRESS => ', to_address)
                 window.co.methods.changeOwnership(1, hash_element.textContent, to_address).send({ from: window.accounts[0], gas: 100000 }, function (error, result) {
                     if (error) {
                         console.log(error)
