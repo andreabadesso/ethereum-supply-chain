@@ -1,4 +1,4 @@
-import { carListManager, addItemToList, format_date, init_web3, carPartListManager, getMultipleActivePart, getActivePart, clearCarDetails, getOwnerHistoryFromEvents, getOwnedItemsFromEvent } from "./utils.js"
+import { carListManager, addItemToList, format_date, init_web3, carPartListManager, getMultipleActivePart, getActivePart, clearCarDetails, getOwnerHistoryFromEvents, getOwnedItemsFromEvent, getOwnedItemsWithDetailsFromEvent } from "./utils.js"
 
 
 
@@ -17,13 +17,61 @@ window.onload = async function () {
     // })
 
     //Get all the parts that belonged to this factory and then check the ones that still do
-    var parts = await getOwnedItemsFromEvent(window.accounts[0], 'TransferPartOwnership')
-    for (var i = 0; i < parts.length; i++) {
-        var owners = await getOwnerHistoryFromEvents('TransferPartOwnership', parts[i])
-        if (owners[owners.length - 1] == window.accounts[0]) {
-            addItemToList(parts[i], "car-part-list", carPartListManager)
-        }
-    }
+    //var parts = await getOwnedItemsFromEvent(window.accounts[0], 'TransferPartOwnership')
+    let parts = await getOwnedItemsWithDetailsFromEvent(window.accounts[0], 'TransferPartOwnership').then(async (parts) => {
+        // Mark parts that we own
+        let markedParts = await Promise.all(parts.map(async (part) => {
+            let owners = await getOwnerHistoryFromEvents('TransferPartOwnership', part.part)
+            if (owners[owners.length - 1] === window.accounts[0]) {
+                return {
+                    ...part,
+                    owned: true
+                }
+            } else {
+                return {
+                    ...part,
+                    owned: false
+                }
+            }
+        }))
+
+        let ownedParts = markedParts.filter(part => {
+            return part.owned
+        })
+
+        ownedParts.forEach(part => {
+            addItemToList(`(${part.part_type}) - ${part.creation_date} - ${part.part}`, "car-part-list", function(e) { carPartListManager.call(e.target, part.part) })
+        })
+    })
+
+    // Get all products transfered (Cars)
+
+    getOwnedItemsFromEvent(window.accounts[0], 'TransferProductOwnership').then(async (products) => {
+        // We should filter cars that the current account owns
+        let markedProducts = await Promise.all(products.map(async (product) => {
+            let owners = await getOwnerHistoryFromEvents('TransferProductOwnership', product)
+            if (owners[owners.length -1] === window.accounts[0]) {
+                return {
+                    product,
+                    owned: true
+                }
+            } else {
+                return {
+                    product,
+                    owned: false
+                }
+            }
+        }))
+
+        let ownedProducts = markedProducts.filter(product => {
+            return product.owned
+        })
+
+        ownedProducts.forEach(({product}) => {
+            addItemToList(product, "car-list", carListManager)
+        })
+    })
+
 
     document.getElementById("build-car").addEventListener("click", function () {
         console.log("Build Car")

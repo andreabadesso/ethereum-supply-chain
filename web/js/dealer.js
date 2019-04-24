@@ -6,8 +6,6 @@ window.onload = async function () {
 
     //First, get all the parts and products that belong to this dealer
     getOwnedItemsFromEvent(window.accounts[0], 'TransferPartOwnership').then((parts) => {
-        console.log("part Events")
-        console.log(parts)
         for (var i = 0; i < parts.length; i++) {
             addItemToList(parts[i], "parts-history", dealerPartListManager)
         }
@@ -15,8 +13,6 @@ window.onload = async function () {
 
     //Then, get products
     getOwnedItemsFromEvent(window.accounts[0], 'TransferProductOwnership').then((products) => {
-        console.log("prod Events")
-        console.log(products)
         for (var i = 0; i < products.length; i++) {
             addItemToList(products[i], "car-history", dealerProductListManager)
         }

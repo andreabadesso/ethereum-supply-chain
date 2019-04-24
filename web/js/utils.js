@@ -554,9 +554,17 @@ async function getOwnedItemsFromEvent(addr, event) {
 
 function populateOwnerDetails(owners, list_name) {
     var owner_string = ""
+
     for (var i = 0; i < owners.length; i++) {
-        owner_string += owners[i] + " "
+        let owner = false
+
+        if (i === owners.length -1) {
+            owner_string += `${owners[i]} (Owner) \r\n`
+        } else {
+            owner_string += `${owners[i]} \r\n`
+        }
     }
+
     document.getElementById(list_name).textContent = owner_string
 }
 
@@ -566,8 +574,6 @@ function dealerPartListManager() {
 
     if (this.classList.contains("active")) {
         getOwnerHistoryFromEvents('TransferPartOwnership', this.textContent).then((owners) => {
-            console.log("bbb")
-            console.log(owners)
             populateOwnerDetails(owners, "part-owners")
         })
     } else {
