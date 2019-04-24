@@ -194,16 +194,16 @@ function getMultipleActivePart() {
 async function init_web3() {
     //Web3 init
     if (typeof web3 != 'undefined') {
-        web3 = new Web3(web3.currentProvider) // what Metamask injected 
+        web3 = new Web3(web3.currentProvider) // what Metamask injected
     } else {
         // Instantiate and set Ganache as your provider
-        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
     }
     //Load accounts
     window.accounts = await web3.eth.getAccounts()
     console.log("Loaded accounts")
 
-    // The interface definition for your smart contract (the ABI) 
+    // The interface definition for your smart contract (the ABI)
     window.pm = new web3.eth.Contract([
         {
             "constant": true,
@@ -358,7 +358,7 @@ async function init_web3() {
         }
     ])
 
-    window.pm.options.address = '0x71110AAb2AAfe5a43bfD574C997519c608499dc8'
+    window.pm.options.address = '0x9D83d61FbC7258dCc9c9cd30b6cAf766fF558512'
 
     window.co = new web3.eth.Contract([
         {
@@ -502,7 +502,7 @@ async function init_web3() {
             "signature": "0xac814490"
         }
     ])
-    window.co.options.address = "0x5356a173ec0BCF064Ef40E4841337183aEC39841"
+    window.co.options.address = "0x344e5f507c55e42AEa3d261c8a736e65C9c25597"
 }
 
 async function getOwnerHistoryFromEvents(event, p_hash) {
